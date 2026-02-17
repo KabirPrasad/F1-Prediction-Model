@@ -4,7 +4,7 @@ model_training.py
 This file is responsible for training and evaluating the ML model
 
 
-- Loads the prepared dataset from data_pipeline.py
+- Loads the prepared dataset 
 - Defines the prediction target (race outcome for a single race)
 - Splits the data using time-aware validation
 - Trains a baseline model
