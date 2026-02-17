@@ -6,7 +6,15 @@ Load data from the folder F1 Data - take the columns which are relevant and make
 Merge raw F1 CSV tables into a single race-driver dataset.
 Each row represents one driver in one race. Of current drivers only
 """
+"""
+merge_tables.py
 
+Purpose:
+Load data from the folder F1 Data - take the columns which are relevant and make a final dataset. 
+Merge raw F1 CSV tables into a single race-driver dataset.
+Each row represents one driver in one race. Of current drivers only
+"""
+import pandas as pd
 
 def merge_tables(dataframes):
     """
@@ -26,7 +34,9 @@ def merge_tables(dataframes):
     qualifying = dataframes["qualifying"]
     status = dataframes["status"]
 
-    # Selecting relevant columns only
+    # Select relevant columns
+
+
     results = results[
         [
             "raceId",
@@ -47,7 +57,6 @@ def merge_tables(dataframes):
             "raceId",
             "year",
             "round",
-            "circuitId",
         ]
     ]
 
@@ -84,36 +93,51 @@ def merge_tables(dataframes):
         ]
     ]
 
-  
-    # Merging tables
-
+    # Merge
 
     df = results.merge(races, on="raceId", how="left")
-
     df = df.merge(drivers, on="driverId", how="left")
-
     df = df.merge(constructors, on="constructorId", how="left")
-
-    df = df.merge(
-        qualifying,
-        on=["raceId", "driverId"],
-        how="left"
-    )
-
+    df = df.merge(qualifying, on=["raceId", "driverId"], how="left")
     df = df.merge(status, on="statusId", how="left")
 
- # Preparing target variable 
+    # Rename important columns
 
-    df = df.rename(columns={"positionOrder": "finish_position"})
+    df = df.rename(columns={
+        "positionOrder": "finish_position",
+        "forename": "driver_forename",
+        "surname": "driver_surname",
+        "name": "constructor_name",
+        "nationality_x": "driver_nationality",
+        "nationality_y": "constructor_nationality"
+    })
+
+    # Filter to modern era (after 2000)
+
+    df = df[df["year"] >= 2000]
+
+    # Convert numeric columns properly
+
 
     df["finish_position"] = pd.to_numeric(df["finish_position"], errors="coerce")
+    df["grid"] = pd.to_numeric(df["grid"], errors="coerce")
+    df["quali_position"] = pd.to_numeric(df["quali_position"], errors="coerce")
 
-    # Keep only finished races if desired
-    df = df[df["finish_position"].notna()]
+    # Drop rows with NA values
 
-    # Sort nicely
+    df = df.dropna()
+
+    # Clean column names
+
+    df.columns = (
+        df.columns
+        .str.lower()
+        .str.replace(" ", "_")
+    )
+
+    # Final sorting
+
     df = df.sort_values(["year", "round", "finish_position"])
-
     df = df.reset_index(drop=True)
 
     return df
