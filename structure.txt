@@ -1,0 +1,52 @@
+F1 CHATBOT DEVELOPMENT ORDER
+
+1. model_loader.py
+   - Implement load_model()
+   - Implement load_prediction_data()
+   - Ensure model loads successfully
+   - Test model independently in Python shell
+
+2. f1_engine.py
+   - Implement predict_race(year, race)
+   - Implement get_podium(year, race)
+   - Implement get_winner(year, race)
+   - Implement get_top_10(year, race)
+   - Implement get_driver_position(year, race, driver)
+   - Test prediction logic independently before moving on
+
+3. utils.py
+   - Implement race name normalization
+   - Implement driver name normalization (if needed)
+   - Implement year validation
+   - Implement output formatting functions
+   - Implement safe LLM output parsing (no raw eval)
+
+4. f1_parser.py
+   - Define Gemini system prompt
+   - Implement parse_query(user_input, llm)
+   - Ensure structured dictionary output
+   - Validate keys and request types
+   - Test parsing independently
+
+5. f1_chatbot.py
+   - Implement process_query(user_input, llm)
+   - Call parse_query()
+   - Route to correct f1_engine function
+   - Format final response using utils
+   - Test full pipeline without Flask
+
+6. app.py
+   - Initialize Flask
+   - Initialize LLM
+   - Create GET and POST routes
+   - Connect frontend form to process_query()
+   - Test end-to-end in browser
+
+7. templates/index.html
+   - Create input form
+   - Display user question
+   - Display chatbot response
+   - Optional: Improve styling and chat layout
+
+BUILD BOTTOM-UP ORDER:
+model_loader → f1_engine → utils → f1_parser → f1_chatbot → app.py → frontend
