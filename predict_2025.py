@@ -68,6 +68,9 @@ def main():
     predictions = model.predict(X)
 
     df_latest["predicted_finish"] = predictions
+    print("Min:", df_latest["predicted_finish"].min())
+    print("Max:", df_latest["predicted_finish"].max())
+    print("Mean:", df_latest["predicted_finish"].mean())
 
     df_latest.to_csv("predictions.csv", index=False)
     print("Predictions saved to predictions.csv")
