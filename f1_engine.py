@@ -18,36 +18,46 @@ This file should NOT:
 
 from model_loader import load_model, load_prediction_data
 
-
-def predict_race(year, race):
-    """
-    Core prediction function.
-
-    Steps:
-    1. Load model
-    2. Load feature data for given race/year
-    3. Run model inference
-    4. Return predictions as DataFrame
-    """
-    pass
+from model_loader import load_prediction_data
 
 
-def get_podium(year, race):
-    """
-    Return top 3 predicted finishers.
-    """
-    pass
+def _filter_race(df, year, race):
+    return df[(df["year"] == year) & (df["round"] == race)]
 
 
 def get_winner(year, race):
-    """
-    Return predicted winner (position 1).
-    """
-    pass
+    df = load_prediction_data()
+    race_df = _filter_race(df, year, race)
+    race_df = race_df.sort_values("predicted_finish")
+    return race_df.iloc[0]
+
+
+def get_podium(year, race):
+    df = load_prediction_data()
+    race_df = _filter_race(df, year, race)
+    race_df = race_df.sort_values("predicted_finish")
+    return race_df.head(3)
 
 
 def get_top_10(year, race):
-    """
+    df = load_prediction_data()
+    race_df = _filter_race(df, year, race)
+    race_df = race_df.sort_values("predicted_finish")
+    return race_df.head(10)
+
+
+def get_driver_position(year, race, driver):
+    df = load_prediction_data()
+    race_df = _filter_race(df, year, race)
+
+    driver_row = race_df[
+        race_df["driver_surname"].str.lower() == driver.lower()
+    ]
+
+    if driver_row.empty:
+        return None
+
+    return driver_row.iloc[0]
     Return top 10 predicted finishers.
     """
     pass
