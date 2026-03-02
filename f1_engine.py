@@ -25,10 +25,15 @@ def _filter_race(df, year, race):
     return df[(df["year"] == year) & (df["round"] == race)]
 
 
-def get_winner(year, race):
+def get_winner(year, race_name):
     df = load_prediction_data()
-    race_df = _filter_race(df, year, race)
+    race_df = _filter_race_by_name(df, year, race_name)
+
     race_df = race_df.sort_values("predicted_finish")
+
+    if race_df.empty:
+        return None
+
     return race_df.iloc[0]
 
 
