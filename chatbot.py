@@ -26,22 +26,41 @@ from f1_engine import (
     simulate_season
 )
 from utils import format_response
+from f1_parser import parse_query
+from f1_engine import (
+    get_podium,
+    get_winner,
+    get_top_10,
+    get_driver_position
+)
+from utils import format_response
 
 
 def process_query(user_input, llm):
-    """
-    Main entry point for chatbot logic.
 
-    Steps:
-    1. Parse user input using LLM
-    2. Validate parsed structure
-    3. Determine request type
-    4. Call appropriate engine function
-    5. Format and return final response
-    """
+    parsed = parse_query(user_input, llm)
 
-    # 1. Parse query
-    # 2. Check for parsing errors
-    # 3. Route based on request type
-    # 4. Return formatted result
-    pass
+    if not parsed:
+        return "Sorry, I couldn't understand the question."
+
+    request_type = parsed.get("request")
+    year = parsed.get("year")
+    race = parsed.get("race")
+
+    if request_type == "winner":
+        result = get_winner(year, race)
+
+    elif request_type == "podium":
+        result = get_podium(year, race)
+
+    elif request_type == "top_10":
+        result = get_top_10(year, race)
+
+    elif request_type == "driver_position":
+        driver = parsed.get("driver")
+        result = get_driver_position(year, race, driver)
+
+    else:
+        return "Unsupported request type."
+
+    return format_response(result, request_type)
