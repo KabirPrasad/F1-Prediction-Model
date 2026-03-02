@@ -28,11 +28,11 @@ def format_response(data, request_type):
         return "No prediction found."
 
     if request_type == "winner":
-        return (
-            f"🏁 Predicted Winner:\n"
-            f"{data['driver_forename']} {data['driver_surname']} "
-            f"({data['constructor_name']})"
-        )
+    return (
+        f"Based on the model's 2026 predictions, "
+        f"{data['driver_forename']} {data['driver_surname']} "
+        f"is projected to win the {data['name']}."
+    )
 
     if request_type == "podium":
         response = "🏆 Predicted Podium:\n"
@@ -59,5 +59,5 @@ def format_response(data, request_type):
             f"{data['driver_forename']} {data['driver_surname']} "
             f"→ P{int(round(data['predicted_finish']))}"
         )
-
+    
     return "Unknown request."
