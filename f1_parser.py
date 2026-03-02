@@ -29,24 +29,30 @@ This file should NOT:
 - Load data
 - Format final user responses
 """
-
 import json
 from utils import safe_parse_llm_output
 
 
 def parse_query(user_input, llm):
-    """
-    Use Gemini to convert user input into structured dictionary.
 
-    Steps:
-    1. Define system prompt explaining expected schema
-    2. Call llm.invoke()
-    3. Safely parse response
-    4. Validate keys and return dictionary
+    system_prompt = """
+    You are an F1 query parser.
+
+    Convert the user question into a Python dictionary with this schema:
+
+    {
+        "year": int,
+        "race": int,
+        "request": "winner" | "podium" | "top_10" | "driver_position",
+        "driver": optional string
+    }
+
+    - race should be the race round number (integer).
+    - If driver is not needed, omit it.
+    - Return ONLY a valid Python dictionary.
     """
 
-    # 1. Create system prompt
-    # 2. Invoke LLM
-    # 3. Parse response safely
-    # 4. Return structured dict
+    response = llm.invoke(system_prompt + "\nUser: " + user_input)
+
+    return safe_parse_llm_output(response.content)
     pass
