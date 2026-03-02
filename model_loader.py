@@ -15,26 +15,25 @@ This file should NOT:
 - Format outputs
 - Call LLM
 """
-
 import joblib
 import pandas as pd
 
+MODEL_PATH = "f1_trained_model.pkl"
+PREDICTIONS_PATH = "predictions.csv"
+
+_model_cache = None
+_predictions_cache = None
+
 
 def load_model():
-    """
-    Load trained model from disk.
-    Return model object.
-    """
-    pass
+    global _model_cache
+    if _model_cache is None:
+        _model_cache = joblib.load(MODEL_PATH)
+    return _model_cache
 
 
 def load_prediction_data():
-    """
-    Load dataset used for prediction.
-
-    Could:
-    - Read CSV
-    - Prepare feature matrix
-    - Filter by year/race
-    """
-    pass
+    global _predictions_cache
+    if _predictions_cache is None:
+        _predictions_cache = pd.read_csv(PREDICTIONS_PATH)
+    return _predictions_cache
