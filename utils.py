@@ -12,39 +12,52 @@ Responsibilities:
 
 This keeps logic clean across files.
 """
-
 import ast
 
 
-def normalize_race_name(race):
-    """
-    Convert informal race names into standardized format.
-    Example:
-    'aussie gp' -> 'Australia'
-    """
-    pass
-
-
-def validate_year(year):
-    """
-    Ensure year is integer and within supported range.
-    """
-    pass
+def safe_parse_llm_output(text):
+    try:
+        return ast.literal_eval(text)
+    except Exception:
+        return None
 
 
 def format_response(data, request_type):
-    """
-    Convert structured prediction output into
-    clean natural language response.
-    """
-    pass
 
+    if data is None:
+        return "No prediction found."
 
-def safe_parse_llm_output(text):
-    """
-    Safely convert LLM string output into dictionary.
+    if request_type == "winner":
+        return (
+            f"🏁 Predicted Winner:\n"
+            f"{data['driver_forename']} {data['driver_surname']} "
+            f"({data['constructor_name']})"
+        )
 
-    Avoid using raw eval().
-    Use ast.literal_eval or JSON parsing.
-    """
-    pass
+    if request_type == "podium":
+        response = "🏆 Predicted Podium:\n"
+        for i, (_, row) in enumerate(data.iterrows(), start=1):
+            response += (
+                f"{i}. {row['driver_forename']} "
+                f"{row['driver_surname']} "
+                f"({row['constructor_name']})\n"
+            )
+        return response
+
+    if request_type == "top_10":
+        response = "🔟 Predicted Top 10:\n"
+        for i, (_, row) in enumerate(data.iterrows(), start=1):
+            response += (
+                f"{i}. {row['driver_forename']} "
+                f"{row['driver_surname']}\n"
+            )
+        return response
+
+    if request_type == "driver_position":
+        return (
+            f"📍 Predicted Finish:\n"
+            f"{data['driver_forename']} {data['driver_surname']} "
+            f"→ P{int(round(data['predicted_finish']))}"
+        )
+
+    return "Unknown request."
