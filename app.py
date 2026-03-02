@@ -1,50 +1,67 @@
-"""
-app.py
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+import joblib
+import pandas as pd
+import os
 
-This is the Flask entry point of the F1 Chatbot application.
-
-Responsibilities:
-- Initialize Flask app
-- Initialize the LLM (via llm.py)
-- Handle HTTP routes
-- Accept user input from frontend
-- Pass user input to f1_chatbot.process_query()
-- Render HTML template with response
-
-This file should NOT contain:
-- ML prediction logic
-- LLM prompt design
-- Data processing
-- Model loading
-- Business logic
-
-Think of this as the "web interface layer".
-"""
-# NOTE this code is not complete - it's just the structure for now. 
-from flask import Flask, request, render_template
-from llm import get_llm
-from f1_chatbot import process_query
-
-# Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 
-# Initialize Gemini LLM
-llm = get_llm()
+MODEL_PATH = "f1_trained_model.pkl"
 
-@app.route("/", methods=["GET", "POST"])
+if not os.path.exists(MODEL_PATH):
+    raise FileNotFoundError("Model file 'f1_trained_model.pkl' not found.")
+
+model = joblib.load(MODEL_PATH)
+
+FEATURE_COLUMNS = [
+    "grid",
+    "quali_position",
+    "prev_finish",
+    "rolling_finish_5",
+    "constructor_avg_finish",
+    "constructor_avg_points",
+    "driver_races",
+    "driver_avg_points",
+    "grid_quali_diff"
+]
+
+
+@app.route("/")
 def home():
-    """
-    Handle homepage rendering and form submission.
+    return jsonify({"message": "F1 Prediction API is running."})
 
-    On POST:
-    - Retrieve user question
-    - Call process_query(question, llm)
-    - Return response to template
 
-    On GET:
-    - Render empty page
-    """
-    pass
+@app.route("/predict", methods=["POST"])
+def predict():
+    try:
+        data = request.get_json()
+
+        if data is None:
+            return jsonify({"error": "Invalid JSON input"}), 400
+
+        missing_features = [col for col in FEATURE_COLUMNS if col not in data]
+        if missing_features:
+            return jsonify({
+                "error": f"Missing features: {missing_features}"
+            }), 400
+
+        input_data = pd.DataFrame([[data[col] for col in FEATURE_COLUMNS]],
+                                  columns=FEATURE_COLUMNS)
+
+        prediction = model.predict(input_data)[0]
+
+        predicted_position = int(round(prediction))
+        predicted_position = max(1, min(20, predicted_position))
+
+        return jsonify({
+            "predicted_finish_position": predicted_position
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 
 if __name__ == "__main__":
