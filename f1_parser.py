@@ -37,18 +37,18 @@ def parse_query(user_input, llm):
 
     system_prompt = """
     You are an F1 query parser.
-
+    
     Convert the user question into a Python dictionary with this schema:
-
+    
     {
         "year": int,
-        "race": int,
+        "race_name": string,
         "request": "winner" | "podium" | "top_10" | "driver_position",
         "driver": optional string
     }
-
-    - race should be the race round number (integer).
-    - If driver is not needed, omit it.
+    
+    - race_name should be the official race name (e.g. "Australian Grand Prix").
+    - If the user does not specify a year, assume 2026.
     - Return ONLY a valid Python dictionary.
     """
 
