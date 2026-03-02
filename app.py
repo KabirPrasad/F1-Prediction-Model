@@ -64,7 +64,23 @@ def predict():
         return jsonify({
             "error": str(e)
         }), 500
+from chatbot import process_query
+from llm import get_llm
 
+llm = get_llm()
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json()
+        question = data.get("question")
+
+        response = process_query(question, llm)
+
+        return jsonify({"answer": response})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run()
