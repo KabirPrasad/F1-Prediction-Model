@@ -69,7 +69,11 @@ def get_driver_position(year, race, driver):
     """
     pass
 
-
+def _filter_race_by_name(df, year, race_name):
+    return df[
+        (df["year"] == year) &
+        (df["name"].str.lower() == race_name.lower())
+    ]
 def simulate_season(year):
     """
     Simulate full season standings based on model predictions.
