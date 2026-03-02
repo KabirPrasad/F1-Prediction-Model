@@ -27,7 +27,16 @@ def _filter_race(df, year, race):
 
 def get_winner(year, race_name):
     df = load_prediction_data()
-    race_df = _filter_race_by_name(df, year, race_name)
+
+    round_number = _get_round_from_name(year, race_name)
+
+    if round_number is None:
+        return None
+
+    race_df = df[
+        (df["year"] == year) &
+        (df["round"] == round_number)
+    ]
 
     race_df = race_df.sort_values("predicted_finish")
 
@@ -74,6 +83,21 @@ def get_driver_position(year, race, driver):
     """
     pass
 
+from model_loader import load_prediction_data, load_race_mapping
+
+
+def _get_round_from_name(year, race_name):
+    mapping = load_race_mapping()
+
+    race_row = mapping[
+        (mapping["year"] == year) &
+        (mapping["name"].str.lower() == race_name.lower())
+    ]
+
+    if race_row.empty:
+        return None
+
+    return int(race_row.iloc[0]["round"])
 def _filter_race_by_name(df, year, race_name):
     return df[
         (df["year"] == year) &
