@@ -30,7 +30,11 @@ def load_model():
     if _model_cache is None:
         _model_cache = joblib.load(MODEL_PATH)
     return _model_cache
-
+    
+def load_race_mapping():
+    df = pd.read_csv("F1Data/races.csv")
+    df = df[["year", "round", "name"]]
+    return df
 
 def load_prediction_data():
     global _predictions_cache
