@@ -10,7 +10,9 @@ CORS(app)
 MODEL_PATH = "f1_trained_model.pkl"
 
 if not os.path.exists(MODEL_PATH):
-    raise FileNotFoundError("Model file 'f1_trained_model.pkl' not found.")
+    from model_training import main
+    print("Model not found. Training model...")
+    main()
 
 model = joblib.load(MODEL_PATH)
 
