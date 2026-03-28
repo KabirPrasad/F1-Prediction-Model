@@ -22,7 +22,7 @@ from model_training import engineer_features
 
 
 def load_data():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.path.dirname(os.path.abspath(_file_))
     data_dir = os.path.join(script_dir, "F1Data")
 
     dataframes = {
@@ -76,6 +76,6 @@ def main():
     print("Predictions saved to predictions.csv")
 
 
-if __name__ == "__main__":
+if name == "_main_":
     main()
         
